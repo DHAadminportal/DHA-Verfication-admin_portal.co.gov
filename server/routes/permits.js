@@ -57,13 +57,6 @@ router.get('/test-all', async (req, res) => {
   }
 });
 
-import express from 'express';
-import { getAllPermits, findPermitByNumber } from '../services/permit-service.js';
-import { generatePermitPDF } from '../services/pdf-generator.js';
-import QRCode from 'qrcode';
-
-const router = express.Router();
-
 router.get('/', async (req, res) => {
   try {
     const result = await getAllPermits();
