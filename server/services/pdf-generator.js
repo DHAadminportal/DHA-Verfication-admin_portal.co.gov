@@ -23,7 +23,7 @@ const imageExists = (filePath) => {
 };
 
 export async function generatePermitPDF(permit) {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
       const doc = new PDFDocument({ 
         size: 'A4',
@@ -36,19 +36,19 @@ export async function generatePermitPDF(permit) {
       doc.on('error', reject);
 
       if (permit.type === 'Permanent Residence') {
-        generatePermanentResidencePDF(doc, permit);
+        await generatePermanentResidencePDF(doc, permit);
       } else if (permit.type === 'General Work Permit') {
-        generateWorkPermitPDF(doc, permit);
+        await generateWorkPermitPDF(doc, permit);
       } else if (permit.type === "Relative's Permit") {
-        generateRelativesPermitPDF(doc, permit);
+        await generateRelativesPermitPDF(doc, permit);
       } else if (permit.type === 'Birth Certificate') {
-        generateBirthCertificatePDF(doc, permit);
+        await generateBirthCertificatePDF(doc, permit);
       } else if (permit.type === 'Naturalization Certificate') {
-        generateNaturalizationPDF(doc, permit);
+        await generateNaturalizationPDF(doc, permit);
       } else if (permit.type === 'Refugee Status (Section 24)') {
-        generateRefugeePDF(doc, permit);
+        await generateRefugeePDF(doc, permit);
       } else {
-        generateGenericPermitPDF(doc, permit);
+        await generateGenericPermitPDF(doc, permit);
       }
 
       doc.end();
@@ -80,7 +80,7 @@ function drawDHAHeader(doc, documentTitle) {
      .text(documentTitle, 50, 120, { align: 'center', width: 495 });
 }
 
-function generatePermanentResidencePDF(doc, permit) {
+async function generatePermanentResidencePDF(doc, permit) {
   drawDHAHeader(doc, 'PERMANENT RESIDENCE PERMIT');
 
   doc.fontSize(8)
@@ -180,23 +180,23 @@ function generatePermanentResidencePDF(doc, permit) {
      .text(`Control Number: ${permit.controlNumber || 'A629649'}`, 50, 750);
 
   // Generate and embed QR Code with verification
-  const verificationUrl = `${process.env.REPL_SLUG ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : 'http://localhost:5000'}/api/permits/${permit.id}/verify-document`;
+  const baseUrl = process.env.RENDER_EXTERNAL_URL || 
+                  (process.env.REPL_SLUG ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : 'http://localhost:5000');
+  const verificationUrl = `${baseUrl}/api/permits/${permit.id}/verify-document`;
   
-  QRCode.toDataURL(verificationUrl, { width: 100, margin: 1, errorCorrectionLevel: 'H' })
-    .then(qrDataUrl => {
-      try {
-        const qrImage = Buffer.from(qrDataUrl.split(',')[1], 'base64');
-        doc.image(qrImage, 450, 200, { width: 80 });
-        // Add verification label
-        doc.fontSize(7).fillColor('#006600').text('SCAN TO VERIFY', 450, 290, { width: 80, align: 'center' });
-      } catch (error) {
-        console.error('Error embedding QR code:', error);
-      }
-    })
-    .catch(error => console.error('QR code generation failed:', error));
+  // Generate QR code synchronously before ending document
+  try {
+    const qrDataUrl = await QRCode.toDataURL(verificationUrl, { width: 100, margin: 1, errorCorrectionLevel: 'H' });
+    const qrImage = Buffer.from(qrDataUrl.split(',')[1], 'base64');
+    doc.image(qrImage, 450, 200, { width: 80 });
+    doc.fontSize(7).fillColor('#006600').text('SCAN TO VERIFY', 450, 290, { width: 80, align: 'center' });
+  } catch (error) {
+    console.error('Error embedding QR code:', error);
+    // Continue without QR code if generation fails
+  }
 }
 
-function generateWorkPermitPDF(doc, permit) {
+async function generateWorkPermitPDF(doc, permit) {
   drawDHAHeader(doc, 'GENERAL WORK VISA SECTION 19(2)');
 
   let y = 170;
@@ -259,7 +259,7 @@ function generateWorkPermitPDF(doc, permit) {
   doc.text('Director-General: Home Affairs', 50, y);
 }
 
-function generateRelativesPermitPDF(doc, permit) {
+async function generateRelativesPermitPDF(doc, permit) {
   drawDHAHeader(doc, "RELATIVE'S VISA (SPOUSE)");
 
   let y = 170;
@@ -316,7 +316,7 @@ function generateRelativesPermitPDF(doc, permit) {
   doc.text('For Director-General: Home Affairs', 50, y);
 }
 
-function generateBirthCertificatePDF(doc, permit) {
+async function generateBirthCertificatePDF(doc, permit) {
   drawDHAHeader(doc, 'BIRTH CERTIFICATE');
 
   doc.fontSize(9).fillColor('#666666')
@@ -393,7 +393,7 @@ function generateBirthCertificatePDF(doc, permit) {
      .text(`Control Number: ${permit.referenceNumber || 'G' + Math.random().toString().slice(2, 9)}`, 50, 750);
 }
 
-function generateNaturalizationPDF(doc, permit) {
+async function generateNaturalizationPDF(doc, permit) {
   doc.fontSize(18).fillColor('#000000').font('Times-Bold')
      .text('Certificate of Naturalisation', 50, 100, { align: 'center', width: 495 });
 
@@ -462,7 +462,7 @@ function generateNaturalizationPDF(doc, permit) {
      .text(`Control Number: ${permit.controlNumber || 'A' + Math.random().toString().slice(2, 9)}`, 50, 750);
 }
 
-function generateRefugeePDF(doc, permit) {
+async function generateRefugeePDF(doc, permit) {
   drawDHAHeader(doc, 'FORMAL RECOGNITION OF REFUGEE STATUS IN THE RSA');
 
   let y = 170;
@@ -540,7 +540,7 @@ function generateRefugeePDF(doc, permit) {
   doc.text('asmverifications@dha.gov.za', 50, y + 12, { align: 'center', width: 495 });
 }
 
-function generateGenericPermitPDF(doc, permit) {
+async function generateGenericPermitPDF(doc, permit) {
   drawDHAHeader(doc, permit.type || 'OFFICIAL DOCUMENT');
 
   let y = 180;
