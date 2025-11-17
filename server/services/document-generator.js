@@ -15,33 +15,33 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PROJECT_ROOT = path.resolve(__dirname, '../..');
 
-// Official DHA Coat of Arms
+// Official DHA Coat of Arms (Processed - background removed, cropped)
 const COAT_OF_ARMS = {
-  primary: path.join(PROJECT_ROOT, 'attached_assets/coat-of-arms-transparent.png'),
-  fallback: path.join(PROJECT_ROOT, 'attached_assets/IMG_9090_1763376601068.jpeg'),
+  primary: path.join(PROJECT_ROOT, 'attached_assets/coat-of-arms-processed.png'),
+  fallback: path.join(PROJECT_ROOT, 'attached_assets/coat-of-arms-transparent.png'),
   svg: path.join(PROJECT_ROOT, 'attached_assets/images/coat-of-arms-official.svg'),
   jpeg: path.join(PROJECT_ROOT, 'Coat of arms'),
   png: path.join(__dirname, '../../attached_assets/images/coat-of-arms.svg')
 };
 
-// Document templates for fallback ONLY
+// Document templates for fallback ONLY (Professional scanned versions - QR codes removed)
 const TEMPLATES = {
-  'Birth Certificate': path.join(PROJECT_ROOT, 'attached_assets/IMG_9057_1763376990739.JPG'),
-  'Permanent Residence': path.join(PROJECT_ROOT, 'attached_assets/IMG_9149_1763377454038.png'),
-  'Permanent Resident': path.join(PROJECT_ROOT, 'attached_assets/IMG_9144_1763377365326.png'),
+  'Birth Certificate': path.join(PROJECT_ROOT, 'attached_assets/processed/IMG_9057_1763376990739-scanned.jpg'),
+  'Permanent Residence': path.join(PROJECT_ROOT, 'attached_assets/processed/IMG_9149_1763377454038-scanned.jpg'),
+  'Permanent Resident': path.join(PROJECT_ROOT, 'attached_assets/processed/IMG_9144_1763377365326-scanned.jpg'),
   'Naturalisation': path.join(PROJECT_ROOT, 'Naturalisation'),
-  'Naturalization Certificate': path.join(PROJECT_ROOT, 'attached_assets/IMG_6491_1763377420758.png'),
-  'Citizenship Certificate': path.join(PROJECT_ROOT, 'attached_assets/IMG_6491_1763377420758.png'),
-  'General Work Permit': path.join(PROJECT_ROOT, 'attached_assets/IMG_9147_1763377365325.png'),
-  'Work Permit': path.join(PROJECT_ROOT, 'attached_assets/IMG_9147_1763377365325.png'),
-  'Work Visa': path.join(PROJECT_ROOT, 'attached_assets/IMG_9142_1763377365326.png'),
-  "Relative's Permit": path.join(PROJECT_ROOT, 'attached_assets/IMG_9145_1763377365326.png'),
-  "Relative's Visa": path.join(PROJECT_ROOT, 'attached_assets/IMG_9145_1763377365326.png'),
-  'Refugee Status (Section 24)': path.join(PROJECT_ROOT, 'attached_assets/IMG_9143_1763377365326.png'),
-  'Refugee Certificate': path.join(PROJECT_ROOT, 'attached_assets/IMG_9146_1763377365326.png'),
-  'Formal Recognition of Refugee Status': path.join(PROJECT_ROOT, 'attached_assets/IMG_9151_1763377831129.jpeg'),
-  'Refugee Status 4 Years': path.join(PROJECT_ROOT, 'attached_assets/IMG_9150_1763377831128.png'),
-  'Declaration of Allegiance': path.join(PROJECT_ROOT, 'attached_assets/IMG_9141_1763377365326.png')
+  'Naturalization Certificate': path.join(PROJECT_ROOT, 'attached_assets/processed/IMG_6491_1763377420758-scanned.jpg'),
+  'Citizenship Certificate': path.join(PROJECT_ROOT, 'attached_assets/processed/IMG_6491_1763377420758-scanned.jpg'),
+  'General Work Permit': path.join(PROJECT_ROOT, 'attached_assets/processed/IMG_9147_1763377365325-scanned.jpg'),
+  'Work Permit': path.join(PROJECT_ROOT, 'attached_assets/processed/IMG_9147_1763377365325-scanned.jpg'),
+  'Work Visa': path.join(PROJECT_ROOT, 'attached_assets/processed/IMG_9142_1763377365326-scanned.jpg'),
+  "Relative's Permit": path.join(PROJECT_ROOT, 'attached_assets/processed/IMG_9145_1763377365326-scanned.jpg'),
+  "Relative's Visa": path.join(PROJECT_ROOT, 'attached_assets/processed/IMG_9145_1763377365326-scanned.jpg'),
+  'Refugee Status (Section 24)': path.join(PROJECT_ROOT, 'attached_assets/processed/IMG_9143_1763377365326-scanned.jpg'),
+  'Refugee Certificate': path.join(PROJECT_ROOT, 'attached_assets/processed/IMG_9146_1763377365326-scanned.jpg'),
+  'Formal Recognition of Refugee Status': path.join(PROJECT_ROOT, 'attached_assets/processed/IMG_9151_1763377831129-scanned.jpg'),
+  'Refugee Status 4 Years': path.join(PROJECT_ROOT, 'attached_assets/processed/IMG_9150_1763377831128-scanned.jpg'),
+  'Declaration of Allegiance': path.join(PROJECT_ROOT, 'attached_assets/processed/IMG_9141_1763377365326-scanned.jpg')
 };
 
 /**
@@ -176,13 +176,9 @@ async function generateFromTemplate(permit) {
       // Overlay applicant data
       overlayApplicantData(doc, permit);
 
-      // Add verification QR code
-      const qrCode = await QRCode.toDataURL(
-        `https://www.dha.gov.za/verify?ref=${permit.permitNumber || permit.referenceNumber}`,
-        { width: 100, errorCorrectionLevel: 'H' }
-      );
-      const qrBuffer = Buffer.from(qrCode.split(',')[1], 'base64');
-      doc.image(qrBuffer, 480, 720, { width: 80, height: 80 });
+      // Note: QR codes have been removed from template-based documents
+      // The scanned templates are professional documents without QR overlays
+      // For verification, use the verification page: https://www.dha.gov.za/verify
 
       doc.end();
     } catch (error) {
