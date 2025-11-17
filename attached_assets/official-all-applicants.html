@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Applicants - DHA Back Office</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dha-green: #007a3d;
+            --dha-dark: #1a1a1a;
+            --dha-gold: #FFD700;
+            --dha-light-gray: #f5f5f5;
+            --dha-white: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--dha-light-gray);
+            color: var(--dha-dark);
+        }
+
+        /* FLAG STRIP */
+        .flag-strip {
+            display: flex;
+            height: 12px;
+            width: 100%;
+        }
+
+        .flag-strip div {
+            flex: 1;
+        }
+
+        .flag-black { background: #000000; }
+        .flag-gold { background: #FFD700; }
+        .flag-white { background: #ffffff; }
+        .flag-green { background: #007a3d; }
+        .flag-blue { background: #0066CC; }
+        .flag-orange { background: #FF6600; }
+
+        /* HEADER */
+        header {
+            background: var(--dha-white);
+            border-bottom: 3px solid var(--dha-gold);
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .coat-of-arms {
+            width: 50px;
+            height: 50px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%25" style="stop-color:%23FFD700;stop-opacity:1" /><stop offset="100%25" style="stop-color:%23DAA520;stop-opacity:1" /></linearGradient></defs><circle cx="100" cy="60" r="50" fill="url(%23grad)"/><path d="M 100 100 L 80 140 L 100 150 L 120 140 Z" fill="%23007a3d"/><path d="M 60 120 L 100 100 L 140 120" fill="none" stroke="%23FFD700" stroke-width="3"/><circle cx="100" cy="180" r="40" fill="%23007a3d"/><path d="M 70 180 L 130 180" stroke="%23FFD700" stroke-width="2" fill="none"/><text x="100" y="195" font-size="24" font-weight="bold" fill="%23FFD700" text-anchor="middle" font-family="Arial">ZA</text></svg>') center/contain no-repeat;
+        }
+
+        .header-title h1 {
+            color: var(--dha-green);
+            font-size: 18px;
+            font-weight: 900;
+        }
+
+        .header-title p {
+            color: #666;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        .header-right {
+            font-size: 12px;
+            color: #666;
+            text-align: right;
+        }
+
+        .back-button {
+            display: inline-block;
+            background: var(--dha-green);
+            color: var(--dha-white);
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid var(--dha-green);
+        }
+
+        .back-button:hover {
+            background: transparent;
+            color: var(--dha-green);
+        }
+
+        /* CONTAINER */
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title h2 {
+            color: var(--dha-green);
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* FILTERS AND STATS */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--dha-green);
+            background: var(--dha-white);
+            color: var(--dha-green);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--dha-green);
+            color: var(--dha-white);
+        }
+
+        .stats-display {
+            background: var(--dha-white);
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #666;
+            border-left: 4px solid var(--dha-green);
+        }
+
+        /* LOADING STATE */
+        .loading {
+            text-align: center;
+            padding: 50px 20px;
+            font-size: 16px;
+            color: #666;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+
+        /* APPLICANTS GRID */
+        .applicants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .applicant-card {
+            background: var(--dha-white);
+            border: 2px solid #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .applicant-card:hover {
+            border-color: var(--dha-green);
+            box-shadow: 0 4px 16px rgba(0, 122, 61, 0.15);
+            transform: translateY(-3px);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--dha-green) 0%, #005a2d 100%);
+            color: var(--dha-white);
+            padding: 15px;
+            border-bottom: 3px solid var(--dha-gold);
+        }
+
+        .card-header h3 {
+            font-size: 16px;
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+
+        .card-header p {
+            font-size: 12px;
+            opacity: 0.9;
+            letter-spacing: 0.5px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 13px;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--dha-green);
+            min-width: 100px;
+        }
+
+        .info-value {
+            color: #555;
+            text-align: right;
+            flex: 1;
+            word-wrap: break-word;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: #00b050;
+            color: var(--dha-white);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .qr-container {
+            text-align: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: var(--dha-light-gray);
+            border-radius: 4px;
+        }
+
+        .qr-placeholder {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+            background: #e0e0e0;
+            border: 2px dashed var(--dha-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            font-size: 36px;
+        }
+
+        .qr-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 2px;
+        }
+
+        /* CARD ACTIONS */
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-view {
+            background: var(--dha-green);
+            color: var(--dha-white);
+            border: 2px solid var(--dha-green);
+        }
+
+        .btn-view:hover {
+            background: transparent;
+            color: var(--dha-green);
+        }
+
+        .btn-download {
+            background: var(--dha-gold);
+            color: var(--dha-dark);
+            border: 2px solid var(--dha-gold);
+        }
+
+        .btn-download:hover {
+            background: transparent;
+            color: var(--dha-gold);
+        }
+
+        .btn-verify {
+            background: #0066CC;
+            color: var(--dha-white);
+            border: 2px solid #0066CC;
+        }
+
+        .btn-verify:hover {
+            background: transparent;
+            color: #0066CC;
+        }
+
+        /* ERROR STATE */
+        .error-message {
+            background: #ffebee;
+            border: 2px solid #ef5350;
+            color: #c62828;
+            padding: 20px;
+            border-radius: 4px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        /* FOOTER */
+        footer {
+            background: var(--dha-dark);
+            color: var(--dha-white);
+            padding: 30px 20px;
+            margin-top: 60px;
+            border-top: 5px solid var(--dha-gold);
+            text-align: center;
+            font-size: 12px;
+        }
+
+        footer p {
+            margin-bottom: 8px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .page-title h2 {
+                font-size: 20px;
+            }
+
+            .applicants-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .header-container {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .header-left {
+                justify-content: center;
+            }
+
+            .header-right {
+                text-align: center;
+            }
+
+            .card-actions {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-title h2 {
+                font-size: 18px;
+            }
+
+            .card-header h3 {
+                font-size: 14px;
+            }
+
+            .info-row {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .info-label,
+            .info-value {
+                text-align: left;
+            }
+
+            .qr-placeholder {
+                width: 120px;
+                height: 120px;
+            }
+        }
+
+        /* WATERMARK */
+        .page-watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 120px;
+            color: rgba(0, 122, 61, 0.02);
+            font-weight: 900;
+            z-index: -1;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-watermark">DEPARTMENT OF HOME AFFAIRS</div>
+
+    <!-- FLAG STRIP -->
+    <div class="flag-strip">
+        <div class="flag-black"></div>
+        <div class="flag-gold"></div>
+        <div class="flag-white"></div>
+        <div class="flag-green"></div>
+        <div class="flag-white"></div>
+        <div class="flag-blue"></div>
+        <div class="flag-orange"></div>
+    </div>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-container">
+            <div class="header-left">
+                <div class="coat-of-arms"></div>
+                <div class="header-title">
+                    <h1>DHA BACK OFFICE</h1>
+                    <p>All Applicants & Documents</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <a href="/" class="back-button">← Back Home</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTAINER -->
+    <div class="container">
+        <div class="page-title">
+            <h2>🇿🇦 All Applicants & Documents</h2>
+            <p>South African Department of Home Affairs - Official Portal</p>
+        </div>
+
+        <!-- CONTROLS -->
+        <div class="controls">
+            <div class="filters">
+                <button class="filter-btn active" onclick="filterByType('All')">All (13)</button>
+                <button class="filter-btn" onclick="filterByType('Permanent Residence')">Residence (8)</button>
+                <button class="filter-btn" onclick="filterByType('General Work Permit')">Work (1)</button>
+                <button class="filter-btn" onclick="filterByType('Relative')">Visas (2)</button>
+                <button class="filter-btn" onclick="filterByType('Certificates')">Certs (2)</button>
+            </div>
+            <div class="stats-display">
+                Showing: <span id="count">13</span> applicants
+            </div>
+        </div>
+
+        <!-- LOADING -->
+        <div id="loading" class="loading">Loading applicants</div>
+
+        <!-- ERROR -->
+        <div id="error" class="error-message" style="display: none;"></div>
+
+        <!-- GRID -->
+        <div id="applicantsContainer" class="applicants-grid"></div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2025 Department of Home Affairs, Republic of South Africa</p>
+        <p>This is an official government portal | POPIA Compliant | Secure Verification System</p>
+    </footer>
+
+    <script>
+        let allApplicants = [];
+        let currentFilter = 'All';
+
+        async function loadApplicants() {
+            try {
+                const response = await fetch('/api/applicants');
+                const data = await response.json();
+
+                if (!data.success || !data.permits) {
+                    throw new Error('Failed to load applicants');
+                }
+
+                allApplicants = data.permits;
+                document.getElementById('loading').style.display = 'none';
+                renderApplicants(allApplicants);
+
+                // Load QR codes for each applicant
+                allApplicants.forEach(app => loadQRCode(app.id));
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                const errorDiv = document.getElementById('error');
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = '❌ Error loading applicants: ' + error.message;
+            }
+        }
+
+        async function loadQRCode(appId) {
+            try {
+                const response = await fetch(`/api/applicants/${appId}/qr`);
+                const data = await response.json();
+
+                if (data.success && data.qrCode) {
+                    const qrElement = document.querySelector(`[data-qr-id="${appId}"]`);
+                    if (qrElement) {
+                        qrElement.innerHTML = `<img src="${data.qrCode}" alt="QR Code">`;
+                    }
+                }
+            } catch (e) {
+                console.warn('QR code load failed for applicant', appId);
+            }
+        }
+
+        function renderApplicants(applicants) {
+            const container = document.getElementById('applicantsContainer');
+            container.innerHTML = applicants.map(app => `
+                <div class="applicant-card">
+                    <div class="card-header">
+                        <h3>${app.name}</h3>
+                        <p>${app.type}</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-row">
+                            <span class="info-label">Permit #:</span>
+                            <span class="info-value">${app.permitNumber || 'N/A'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Type:</span>
+                            <span class="info-value">${app.type}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Nationality:</span>
+                            <span class="info-value">${app.nationality || 'South African'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Status:</span>
+                            <span class="info-value"><span class="status-badge">✓ ${app.status || 'ACTIVE'}</span></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Issue Date:</span>
+                            <span class="info-value">${app.issueDate || 'N/A'}</span>
+                        </div>
+                        ${app.expiryDate ? `
+                        <div class="info-row">
+                            <span class="info-label">Expiry:</span>
+                            <span class="info-value">${app.expiryDate}</span>
+                        </div>
+                        ` : ''}
+
+                        <div class="qr-container">
+                            <div class="qr-placeholder" data-qr-id="${app.id}">📱</div>
+                        </div>
+
+                        <div class="card-actions">
+                            <button class="action-btn btn-view" onclick="viewProfile('${app.id}')">👁 View</button>
+                            <button class="action-btn btn-download" onclick="downloadPDF('${app.id}')">⬇ PDF</button>
+                            <button class="action-btn btn-verify" onclick="verifyQR('${app.id}')">✓ Verify</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('count').textContent = applicants.length;
+        }
+
+        function filterByType(type) {
+            currentFilter = type;
+
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Filter applicants
+            let filtered = allApplicants;
+
+            if (type === 'Permanent Residence') {
+                filtered = allApplicants.filter(a => a.type === 'Permanent Residence');
+            } else if (type === 'General Work Permit') {
+                filtered = allApplicants.filter(a => a.type === 'General Work Permit');
+            } else if (type === 'Relative') {
+                filtered = allApplicants.filter(a => a.type === "Relative's Permit");
+            } else if (type === 'Certificates') {
+                filtered = allApplicants.filter(a => ['Birth Certificate', 'Naturalization Certificate'].includes(a.type));
+            }
+
+            renderApplicants(filtered);
+            filtered.forEach(app => loadQRCode(app.id));
+        }
+
+        function viewProfile(appId) {
+            alert('Profile view for applicant ' + appId + ' (coming soon)');
+        }
+
+        function downloadPDF(appId) {
+            window.open(`/api/applicants/${appId}/pdf`, '_blank');
+        }
+
+        function verifyQR(appId) {
+            // Get the permit info and generate verification URL
+            const applicant = allApplicants.find(a => a.id == appId);
+            if (applicant) {
+                const ref = applicant.permitNumber || applicant.referenceNumber;
+                window.open(`/verify?ref=${ref}&id=${appId}`, '_blank');
+            }
+        }
+
+        // Load on page load
+        loadApplicants();
+    </script>
+</body>
+</html>
