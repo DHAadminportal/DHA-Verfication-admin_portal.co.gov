@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Document - DHA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dha-green: #007a3d;
+            --dha-dark: #1a1a1a;
+            --dha-gold: #FFD700;
+            --dha-light-gray: #f5f5f5;
+            --dha-white: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--dha-light-gray);
+            color: var(--dha-dark);
+        }
+
+        /* FLAG STRIP */
+        .flag-strip {
+            display: flex;
+            height: 12px;
+            width: 100%;
+        }
+
+        .flag-strip div {
+            flex: 1;
+        }
+
+        .flag-black { background: #000000; }
+        .flag-gold { background: #FFD700; }
+        .flag-white { background: #ffffff; }
+        .flag-green { background: #007a3d; }
+        .flag-blue { background: #0066CC; }
+        .flag-orange { background: #FF6600; }
+
+        /* HEADER */
+        header {
+            background: var(--dha-white);
+            border-bottom: 3px solid var(--dha-gold);
+            padding: 15px 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .header-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .coat-of-arms {
+            width: 50px;
+            height: 50px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%25" style="stop-color:%23FFD700;stop-opacity:1" /><stop offset="100%25" style="stop-color:%23DAA520;stop-opacity:1" /></linearGradient></defs><circle cx="100" cy="60" r="50" fill="url(%23grad)"/><path d="M 100 100 L 80 140 L 100 150 L 120 140 Z" fill="%23007a3d"/><path d="M 60 120 L 100 100 L 140 120" fill="none" stroke="%23FFD700" stroke-width="3"/><circle cx="100" cy="180" r="40" fill="%23007a3d"/><path d="M 70 180 L 130 180" stroke="%23FFD700" stroke-width="2" fill="none"/><text x="100" y="195" font-size="24" font-weight="bold" fill="%23FFD700" text-anchor="middle" font-family="Arial">ZA</text></svg>') center/contain no-repeat;
+        }
+
+        .header-title h1 {
+            color: var(--dha-green);
+            font-size: 18px;
+            font-weight: 900;
+        }
+
+        .header-title p {
+            color: #666;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        /* CONTAINER */
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .verify-card {
+            background: var(--dha-white);
+            border: 2px solid #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--dha-green) 0%, #005a2d 100%);
+            color: var(--dha-white);
+            padding: 25px;
+            border-bottom: 3px solid var(--dha-gold);
+            text-align: center;
+        }
+
+        .card-header h2 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .card-header p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        /* INPUT SECTION */
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-section h3 {
+            color: var(--dha-green);
+            font-size: 16px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"],
+        input[type="file"] {
+            flex: 1;
+            min-width: 250px;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="file"]:focus {
+            outline: none;
+            border-color: var(--dha-green);
+            box-shadow: 0 0 0 3px rgba(0, 122, 61, 0.1);
+        }
+
+        input[type="file"] {
+            cursor: pointer;
+        }
+
+        button {
+            padding: 12px 30px;
+            background: var(--dha-green);
+            color: var(--dha-white);
+            border: 2px solid var(--dha-green);
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        button:hover {
+            background: transparent;
+            color: var(--dha-green);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* RESULTS SECTION */
+        .results-section {
+            display: none;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .results-section.show {
+            display: block;
+        }
+
+        .verification-status {
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .verification-status.success {
+            background: #e8f5e9;
+            border-left: 4px solid #00b050;
+            color: #2e7d32;
+        }
+
+        .verification-status.error {
+            background: #ffebee;
+            border-left: 4px solid #ef5350;
+            color: #c62828;
+        }
+
+        .document-info {
+            background: var(--dha-light-gray);
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .info-item {
+            border-bottom: 2px solid var(--dha-white);
+            padding-bottom: 12px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--dha-green);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            color: #333;
+            font-size: 14px;
+        }
+
+        /* QR SCANNER */
+        .qr-scanner-section {
+            text-align: center;
+            padding: 20px;
+            background: var(--dha-light-gray);
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .qr-instruction {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        #qrVideo {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 4px;
+            display: none;
+            border: 2px solid var(--dha-green);
+        }
+
+        .qr-controls {
+            margin-top: 15px;
+        }
+
+        /* LOADING STATE */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 122, 61, 0.3);
+            border-top-color: var(--dha-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* FOOTER */
+        footer {
+            background: var(--dha-dark);
+            color: var(--dha-white);
+            padding: 20px;
+            margin-top: 60px;
+            text-align: center;
+            font-size: 12px;
+            border-top: 5px solid var(--dha-gold);
+        }
+
+        footer p {
+            margin-bottom: 5px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px auto;
+            }
+
+            .card-header h2 {
+                font-size: 18px;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            input[type="text"],
+            input[type="file"],
+            button {
+                min-width: 100%;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* WATERMARK */
+        .page-watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 120px;
+            color: rgba(0, 122, 61, 0.02);
+            font-weight: 900;
+            z-index: -1;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-watermark">DEPARTMENT OF HOME AFFAIRS</div>
+
+    <!-- FLAG STRIP -->
+    <div class="flag-strip">
+        <div class="flag-black"></div>
+        <div class="flag-gold"></div>
+        <div class="flag-white"></div>
+        <div class="flag-green"></div>
+        <div class="flag-white"></div>
+        <div class="flag-blue"></div>
+        <div class="flag-orange"></div>
+    </div>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-container">
+            <div class="header-left">
+                <div class="coat-of-arms"></div>
+                <div class="header-title">
+                    <h1>VERIFY DOCUMENT</h1>
+                    <p>South African Department of Home Affairs</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTAINER -->
+    <div class="container">
+        <div class="verify-card">
+            <div class="card-header">
+                <h2>✓ Document Verification Portal</h2>
+                <p>Verify the authenticity of DHA documents using QR codes or reference numbers</p>
+            </div>
+
+            <div class="card-body">
+                <!-- VERIFICATION METHODS -->
+                <div id="inputSection" class="input-section">
+                    <h3>🔍 Verify Document</h3>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="color: #666; font-size: 12px; margin-bottom: 10px;">Method 1: Permit Reference Number</h4>
+                        <div class="input-group">
+                            <input 
+                                type="text" 
+                                id="permitRef" 
+                                placeholder="Enter permit or reference number (e.g., PR/PTA/2025/10/13459)"
+                                onkeyup="if(event.key==='Enter') verifyByReference()"
+                            >
+                            <button onclick="verifyByReference()">Verify</button>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="color: #666; font-size: 12px; margin-bottom: 10px;">Method 2: File Number / ID</h4>
+                        <div class="input-group">
+                            <input 
+                                type="text" 
+                                id="fileNumber" 
+                                placeholder="Enter file number or ID number"
+                                onkeyup="if(event.key==='Enter') verifyByFile()"
+                            >
+                            <button onclick="verifyByFile()">Verify</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RESULTS -->
+                <div id="resultsSection" class="results-section">
+                    <div id="verificationStatus" class="verification-status"></div>
+                    <div id="documentInfo" class="document-info" style="display: none;">
+                        <h3 style="color: var(--dha-green); margin-bottom: 15px;">📋 Document Details</h3>
+                        <div id="detailsContent" class="info-grid"></div>
+                    </div>
+                </div>
+
+                <!-- INSTRUCTIONS -->
+                <div style="margin-top: 30px; padding: 20px; background: #f0f7ff; border-left: 4px solid #0066CC; border-radius: 4px;">
+                    <h4 style="color: #0066CC; margin-bottom: 10px;">ℹ️ How to Verify</h4>
+                    <ul style="margin-left: 20px; color: #555; font-size: 13px; line-height: 1.8;">
+                        <li>Use the <strong>Permit Reference Number</strong> found on your official document (format: XX/XXX/XXXX/XX/XXXXX)</li>
+                        <li>Or use the <strong>File Number / ID Number</strong> associated with your application</li>
+                        <li>Results will display official information including issue dates, status, and document type</li>
+                        <li>All verifications are logged for audit purposes</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2025 Department of Home Affairs, Republic of South Africa</p>
+        <p>Official Verification Portal | POPIA Compliant | Secure System</p>
+    </footer>
+
+    <script>
+        // Get URL parameters
+        const params = new URLSearchParams(window.location.search);
+        const refParam = params.get('ref');
+        const idParam = params.get('id');
+
+        // Auto-verify if parameters are provided
+        if (refParam) {
+            document.getElementById('permitRef').value = refParam;
+            verifyByReference();
+        }
+
+        async function verifyByReference() {
+            const ref = document.getElementById('permitRef').value.trim();
+            if (!ref) {
+                alert('Please enter a permit or reference number');
+                return;
+            }
+
+            showLoading();
+
+            try {
+                const response = await fetch('/api/validate-permit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ permitNumber: ref })
+                });
+
+                const data = await response.json();
+                displayResults(data, ref);
+            } catch (error) {
+                showError('Error verifying document: ' + error.message);
+            }
+        }
+
+        async function verifyByFile() {
+            const fileNum = document.getElementById('fileNumber').value.trim();
+            if (!fileNum) {
+                alert('Please enter a file or ID number');
+                return;
+            }
+
+            showLoading();
+
+            try {
+                const response = await fetch('/api/validate-permit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ permitNumber: fileNum })
+                });
+
+                const data = await response.json();
+                displayResults(data, fileNum);
+            } catch (error) {
+                showError('Error verifying document: ' + error.message);
+            }
+        }
+
+        function showLoading() {
+            const resultsSection = document.getElementById('resultsSection');
+            const statusDiv = document.getElementById('verificationStatus');
+            resultsSection.classList.add('show');
+            statusDiv.innerHTML = '<div style="text-align: center; padding: 20px;"><span class="loading-spinner"></span> Verifying...</div>';
+            statusDiv.className = 'verification-status';
+        }
+
+        function displayResults(data, ref) {
+            const resultsSection = document.getElementById('resultsSection');
+            const statusDiv = document.getElementById('verificationStatus');
+            const detailsDiv = document.getElementById('documentInfo');
+            const detailsContent = document.getElementById('detailsContent');
+
+            resultsSection.classList.add('show');
+
+            if (data.valid && data.permit) {
+                const permit = data.permit;
+                statusDiv.className = 'verification-status success';
+                statusDiv.innerHTML = `
+                    <strong>✓ Document Verified Successfully</strong>
+                    <p>This document has been verified as a legitimate South African DHA record.</p>
+                `;
+
+                const details = {
+                    'Name': permit.name || permit.surname + ' ' + permit.forename,
+                    'Document Type': permit.type,
+                    'Permit Number': permit.permitNumber || permit.referenceNumber,
+                    'Status': permit.status || 'Issued',
+                    'Issue Date': permit.issueDate,
+                    'Expiry Date': permit.expiryDate || 'Permanent',
+                    'Nationality': permit.nationality,
+                    'Category': permit.category || 'N/A'
+                };
+
+                detailsContent.innerHTML = Object.entries(details)
+                    .map(([label, value]) => `
+                        <div class="info-item">
+                            <div class="info-label">${label}</div>
+                            <div class="info-value">${value || 'N/A'}</div>
+                        </div>
+                    `)
+                    .join('');
+
+                detailsDiv.style.display = 'block';
+            } else {
+                statusDiv.className = 'verification-status error';
+                statusDiv.innerHTML = `
+                    <strong>✗ Document Not Found</strong>
+                    <p>The reference number or file number provided could not be verified in the DHA database.</p>
+                    <p>Please check that you have entered the correct information and try again.</p>
+                `;
+                detailsDiv.style.display = 'none';
+            }
+        }
+
+        function showError(message) {
+            const statusDiv = document.getElementById('verificationStatus');
+            const resultsSection = document.getElementById('resultsSection');
+            resultsSection.classList.add('show');
+            statusDiv.className = 'verification-status error';
+            statusDiv.innerHTML = `<strong>⚠ Error:</strong> ${message}`;
+            document.getElementById('documentInfo').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

@@ -122,7 +122,7 @@ app.use('/public', express.static(FINAL_ASSETS_DIR, {
 // Root route - serve main back office interface
 app.get('/', (req, res) => {
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  serveFile(res, 'index.html', ['/opt/render/project/attached_assets/index.html'], INLINE_HTML.index);
+  serveFile(res, 'official-index.html', ['/opt/render/project/attached_assets/official-index.html'], INLINE_HTML.index);
 });
 
 // Admin dashboard route
@@ -170,7 +170,7 @@ app.get('/permit-profile', (req, res) => {
 // Verification route
 app.get('/verify', (req, res) => {
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  serveFile(res, 'verify.html', ['/opt/render/project/attached_assets/verify.html']);
+  serveFile(res, 'official-verify.html', ['/opt/render/project/attached_assets/official-verify.html']);
 });
 
 // Work Permit route
@@ -182,7 +182,7 @@ app.get('/work-permit', (req, res) => {
 // All Applicants route
 app.get('/all-applicants', (req, res) => {
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  serveFile(res, 'all-applicants.html', ['/opt/render/project/attached_assets/all-applicants.html']);
+  serveFile(res, 'official-all-applicants.html', ['/opt/render/project/attached_assets/official-all-applicants.html']);
 });
 
 // Use permits router
