@@ -17,7 +17,8 @@ const PROJECT_ROOT = path.resolve(__dirname, '../..');
 
 // Official DHA Coat of Arms
 const COAT_OF_ARMS = {
-  primary: path.join(PROJECT_ROOT, 'attached_assets/IMG_9090_1763376601068.jpeg'),
+  primary: path.join(PROJECT_ROOT, 'attached_assets/coat-of-arms-transparent.png'),
+  fallback: path.join(PROJECT_ROOT, 'attached_assets/IMG_9090_1763376601068.jpeg'),
   svg: path.join(PROJECT_ROOT, 'attached_assets/images/coat-of-arms-official.svg'),
   jpeg: path.join(PROJECT_ROOT, 'Coat of arms'),
   png: path.join(__dirname, '../../attached_assets/images/coat-of-arms.svg')
